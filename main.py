@@ -1,5 +1,7 @@
 # Import FastAPI Framework
 from fastapi import FastAPI, HTTPException, Depends
+#Import HTMLREsponse to return an HTML welcome page instead of plain JSON
+from fastapi.responses import HTMLResponse
 # Import Pydantic BaseModel for data validation
 from pydantic import BaseModel
 # Import SQLAlchemy ORM session
@@ -51,10 +53,39 @@ def get_db():
 
 
 # WELCOME ENDPOINT
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def root():
-    return {"message": "Hello and welcome, Project Tracker of Mercedes Levinson-Mader."}
-
+    # Create an HTML string with navigation links to all key endpoints
+    html_content = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Project Tracker API!</title>
+        <style>
+            body { font-family: sans-serif; max-width: 800px; margin: 1rem auto; padding: 1rem; }
+            h1 { color: #2c3e50; }
+            li { margin: 0.5rem 0; }
+            a { text-decoration: none; color: #3498db; }
+            a:hover { text-decoration: underline; }
+            code { background: #f4f4f4; padding: 0.2rem 0.4rem; border-radius: 4px; }
+        </style>
+    </head>
+    <body>
+        <h1>🃋 Project Tracker API</h1>
+        <p>Welcome to your task management API. Use the links below to explore.</p>
+        <ul>
+            <li>List all tasks (supports filtering) 🔗 <a href="/tasks">/tasks</a></li>
+            <li>List all categories                 🔗 <a href="/categories">/categories</a></li>
+            <li>List all projects                   🔗 <a href="/projects">/projects</a></li>
+            <li>Interact with the API               🔗 <a href="/docs">/docs</a></li>
+        </ul>
+        <hr>
+        <p><small>Powered by FastAPI | <a href="https://github.com/sadiecakes/project-tracker">GitHub</a></small></p>
+    </body>
+    </html>
+    """
+    # Return the HTML string as a response which will be rendered in the browser
+    return HTMLResponse(content=html_content)
 
 # GET /tasks -- list all tasks with optional filters for project, phase, and category
 @app.get("/tasks", response_model=List[TaskResponse])
